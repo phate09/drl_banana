@@ -17,10 +17,10 @@ print('State shape: ', env.observation_space.shape)
 print('Number of actions: ', env.action_space.n)
 
 agent = Agent(state_size=8, action_size=4, seed=0)
-STARTING_BETA = 0.4
+STARTING_BETA = 0.5
 
 
-def dqn(n_episodes=2000, max_t=1000, eps_start=1.0, eps_end=0.01, eps_decay=0.995):
+def dqn(n_episodes=2000, max_t=1000, eps_start=1.0, eps_end=0.005):
     """Deep Q-Learning.
 
     Params

@@ -2,7 +2,7 @@ import numpy as np
 import random
 from collections import deque
 
-from model import QNetwork
+from model import DuelingQNetwork
 
 import torch
 import torch.nn as nn
@@ -11,11 +11,11 @@ import torch.optim as optim
 # from old.replay_buffer import PrioritizedReplayBuffer
 from utils.PrioReplayBuffer import PrioReplayBuffer
 
-BUFFER_SIZE = int(1e6)  # replay buffer size
+BUFFER_SIZE = int(1e5)  # replay buffer size
 BATCH_SIZE = 64  # minibatch size
 GAMMA = 0.99  # discount factor
 TAU = 1e-3  # for soft update of target parameters
-LR = 1e-3  # learning rate
+LR = 1e-4  # learning rate
 UPDATE_EVERY = 16  # how often to update the network
 # UPDATE_TARGET_EVERY = 100 * UPDATE_EVERY #20
 
@@ -40,12 +40,12 @@ class Agent():
         self.seed = random.seed(seed)
 
         # Q-Network
-        self.qnetwork_local = QNetwork(state_size, action_size, seed).to(device)
-        self.qnetwork_target = QNetwork(state_size, action_size, seed).to(device)
+        self.qnetwork_local = DuelingQNetwork(state_size, action_size, seed).to(device)
+        self.qnetwork_target = DuelingQNetwork(state_size, action_size, seed).to(device)
         self.optimizer = optim.Adam(self.qnetwork_local.parameters(), lr=LR)
 
         # Replay memory
-        self.memory = PrioReplayBuffer(buf_size=BUFFER_SIZE)  # ReplayBuffer(BUFFER_SIZE)
+        self.memory = PrioReplayBuffer(buf_size=BUFFER_SIZE, prob_alpha=0.7)  # ReplayBuffer(BUFFER_SIZE)
         self.local_memory = []
         # Initialize time step (for updating every UPDATE_EVERY steps)
         self.t_step = 0
@@ -142,7 +142,7 @@ class Agent():
         error = 0.5 * (target_Q.detach() - Qa_s).pow(2) * is_values.detach()  # * td_errors
         error = error.mean()
         error.backward()
-        nn.utils.clip_grad_norm_(self.qnetwork_local.parameters(), 1, norm_type=float("inf"))
+        nn.utils.clip_grad_norm_(self.qnetwork_local.parameters(), 1, norm_type=2)  # float("inf")
         self.optimizer.step()
 
     def soft_update(self, local_model, target_model, tau):
