@@ -45,7 +45,7 @@ class Agent():
         self.optimizer = optim.Adam(self.qnetwork_local.parameters(), lr=LR)
 
         # Replay memory
-        self.memory = PrioReplayBuffer(buf_size=BUFFER_SIZE, prob_alpha=0.7)  # ReplayBuffer(BUFFER_SIZE)
+        self.memory = PrioReplayBuffer(buf_size=BUFFER_SIZE, prob_alpha=0)  # ReplayBuffer(BUFFER_SIZE)
         self.local_memory = []
         # Initialize time step (for updating every UPDATE_EVERY steps)
         self.t_step = 0
