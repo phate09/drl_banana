@@ -2,17 +2,17 @@ import numpy as np
 import random
 from collections import deque
 
-from model import DuelingQNetwork
+from model import QNetwork
 
 import torch
 import torch.nn as nn
 import torch.optim as optim
 
 # from old.replay_buffer import PrioritizedReplayBuffer
-from utils.PrioReplayBuffer import PrioReplayBuffer
+# from utils.PrioReplayBuffer import PrioReplayBuffer
 
-BUFFER_SIZE = int(1e5)  # replay buffer size
-BATCH_SIZE = 64  # minibatch size
+BUFFER_SIZE = int(1e6)  # replay buffer size
+BATCH_SIZE = 128  # minibatch size
 GAMMA = 0.99  # discount factor
 TAU = 1e-3  # for soft update of target parameters
 LR = 1e-4  # learning rate
@@ -40,12 +40,12 @@ class Agent():
         self.seed = random.seed(seed)
 
         # Q-Network
-        self.qnetwork_local = DuelingQNetwork(state_size, action_size, seed).to(device)
-        self.qnetwork_target = DuelingQNetwork(state_size, action_size, seed).to(device)
+        self.qnetwork_local = QNetwork(state_size, action_size, seed).to(device)
+        self.qnetwork_target = QNetwork(state_size, action_size, seed).to(device)
         self.optimizer = optim.Adam(self.qnetwork_local.parameters(), lr=LR)
 
         # Replay memory
-        self.memory = PrioReplayBuffer(buf_size=BUFFER_SIZE, prob_alpha=0)  # ReplayBuffer(BUFFER_SIZE)
+        self.memory = ReplayBuffer(BUFFER_SIZE)  # PrioReplayBuffer(buf_size=BUFFER_SIZE, prob_alpha=0)
         self.local_memory = []
         # Initialize time step (for updating every UPDATE_EVERY steps)
         self.t_step = 0
@@ -177,7 +177,7 @@ class ReplayBuffer:
         # self.experience = namedtuple("Experience", field_names=["state", "action", "reward", "next_state", "done"])
         self.seed = random.seed(seed)
 
-    def push(self, memory, td_error):
+    def populate(self, memory, td_error=0):
         """Add a new experience to memory."""
         # e = self.experience(state, action, reward, next_state, done)
         self.memory.append(memory)
@@ -185,16 +185,7 @@ class ReplayBuffer:
     def sample(self, batch_size, beta):
         """Randomly sample a batch of experiences from memory."""
         experiences = random.sample(self.memory, k=batch_size)
-
-        # states = torch.from_numpy(np.vstack([e.state for e in experiences if e is not None])).float().to(device)
-        # actions = torch.from_numpy(np.vstack([e.action for e in experiences if e is not None])).long().to(device)
-        # rewards = torch.from_numpy(np.vstack([e.reward for e in experiences if e is not None])).float().to(device)
-        # next_states = torch.from_numpy(
-        #     np.vstack([e.next_state for e in experiences if e is not None])).float().to(device)
-        # dones = torch.from_numpy(
-        #     np.vstack([e.done for e in experiences if e is not None]).astype(np.uint8)).float().to(device)
-
-        return experiences, 1.0, 1.0
+        return experiences, [1.0]*batch_size, [1.0]*batch_size
 
     def update_priorities(self, a, b):
         pass
