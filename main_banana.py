@@ -1,4 +1,5 @@
 import datetime
+import os
 from collections import deque
 
 import matplotlib.pyplot as plt
@@ -12,7 +13,6 @@ from utils.Scheduler import Scheduler
 
 currentDT = datetime.datetime.now()
 print(f'Start at {currentDT.strftime("%Y-%m-%d %H:%M:%S")}')
-writer = SummaryWriter()
 # env = gym.make('LunarLander-v2')
 # env.seed(0)
 env = UnityEnvironment(file_name="/home/edoardo/Downloads/Banana_Linux_NoVis/Banana.x86_64")
@@ -36,8 +36,15 @@ print('States look like:', state)
 state_size = len(state)
 print('States have length:', state_size)
 
-agent = Agent(state_size=state_size, action_size=action_size, seed=0)
 STARTING_BETA = 0.5
+ALPHA = 0.4
+EPS_DECAY = 0.2
+
+current_time = currentDT.strftime('%b%d_%H-%M-%S')
+comment = f"alpha={ALPHA}, beta={STARTING_BETA}->1.0, eps_decay={EPS_DECAY}"
+log_dir = os.path.join('runs', current_time + '_' + comment)
+writer = SummaryWriter(log_dir=log_dir)
+agent = Agent(state_size=state_size, action_size=action_size, seed=0, alpha=ALPHA)
 
 
 def dqn(n_episodes=2000, max_t=1000, eps_start=1.0, eps_end=0.01):
@@ -55,7 +62,7 @@ def dqn(n_episodes=2000, max_t=1000, eps_start=1.0, eps_end=0.01):
     scores_window = deque(maxlen=100)  # last 100 scores
 
     betas = Scheduler(STARTING_BETA, 1.0, n_episodes)
-    eps = Scheduler(eps_start, eps_end, n_episodes * 0.2)
+    eps = Scheduler(eps_start, eps_end, n_episodes * EPS_DECAY)
     for i_episode in range(n_episodes):
         env_info = env.reset(train_mode=True)[brain_name]  # reset the environment
         state = env_info.vector_observations[0]  # get the current state
@@ -86,7 +93,8 @@ def dqn(n_episodes=2000, max_t=1000, eps_start=1.0, eps_end=0.01):
         if i_episode + 1 % 100 == 0:
             print(f'\rEpisode {i_episode + 1}\tAverage Score: {np.mean(scores_window):.2f} '
                   f'eps={eps.get(i_episode):.3f} beta={betas.get(i_episode):.3f}')
-        if np.mean(scores_window) >= 200.0:
+        torch.save(agent.qnetwork_local.state_dict(), 'checkpoint.pth')
+        if np.mean(scores_window) >= 17.0:
             print(f'\nEnvironment solved in {i_episode - 100:d} episodes!\tAverage Score: {np.mean(scores_window):.2f}')
             torch.save(agent.qnetwork_local.state_dict(), 'checkpoint.pth')
             break
