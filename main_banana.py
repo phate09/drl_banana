@@ -1,11 +1,10 @@
-import torch
-from collections import deque
 import datetime
 from collections import deque
 
 import matplotlib.pyplot as plt
 import numpy as np
 import torch
+from tensorboardX import SummaryWriter
 from unityagents import UnityEnvironment
 
 from dqn_agent import Agent
@@ -13,6 +12,7 @@ from utils.Scheduler import Scheduler
 
 currentDT = datetime.datetime.now()
 print(f'Start at {currentDT.strftime("%Y-%m-%d %H:%M:%S")}')
+writer = SummaryWriter()
 # env = gym.make('LunarLander-v2')
 # env.seed(0)
 env = UnityEnvironment(file_name="/home/edoardo/Downloads/Banana_Linux_NoVis/Banana.x86_64")
@@ -40,7 +40,7 @@ agent = Agent(state_size=state_size, action_size=action_size, seed=0)
 STARTING_BETA = 0.5
 
 
-def dqn(n_episodes=2000, max_t=1000, eps_start=1.0, eps_end=0.05):
+def dqn(n_episodes=2000, max_t=1000, eps_start=1.0, eps_end=0.01):
     """Deep Q-Learning.
 
     Params
@@ -74,6 +74,10 @@ def dqn(n_episodes=2000, max_t=1000, eps_start=1.0, eps_end=0.05):
                 break
         scores_window.append(score)  # save most recent score
         scores.append(score)  # save most recent score
+        writer.add_scalar('data/score', score, i_episode)
+        writer.add_scalar('data/score_average', np.mean(scores_window), i_episode)
+        writer.add_scalar('data/epsilon', eps.get(i_episode), i_episode)
+        writer.add_scalar('data/beta', betas.get(i_episode), i_episode)
         # eps = max(eps_end, eps_decay * eps)  # decrease epsilon
         print(
             f'\rEpisode {i_episode + 1}\tAverage Score: {np.mean(scores_window):.2f} '
