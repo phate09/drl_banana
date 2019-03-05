@@ -1,16 +1,15 @@
-import gym
-import random
 import torch
-import numpy as np
 from collections import deque
-import matplotlib.pyplot as plt
 import datetime
+from collections import deque
+
+import matplotlib.pyplot as plt
+import numpy as np
+import torch
+from unityagents import UnityEnvironment
 
 from dqn_agent import Agent
 from utils.Scheduler import Scheduler
-from unityagents import UnityEnvironment
-import numpy as np
-
 
 currentDT = datetime.datetime.now()
 print(f'Start at {currentDT.strftime("%Y-%m-%d %H:%M:%S")}')
@@ -41,7 +40,7 @@ agent = Agent(state_size=state_size, action_size=action_size, seed=0)
 STARTING_BETA = 0.5
 
 
-def dqn(n_episodes=2000, max_t=1000, eps_start=1.0, eps_end=0.005):
+def dqn(n_episodes=2000, max_t=1000, eps_start=1.0, eps_end=0.05):
     """Deep Q-Learning.
 
     Params
@@ -56,7 +55,7 @@ def dqn(n_episodes=2000, max_t=1000, eps_start=1.0, eps_end=0.005):
     scores_window = deque(maxlen=100)  # last 100 scores
 
     betas = Scheduler(STARTING_BETA, 1.0, n_episodes)
-    eps = Scheduler(eps_start, eps_end, n_episodes * 0.1)
+    eps = Scheduler(eps_start, eps_end, n_episodes * 0.2)
     for i_episode in range(n_episodes):
         env_info = env.reset(train_mode=True)[brain_name]  # reset the environment
         state = env_info.vector_observations[0]  # get the current state

@@ -1,22 +1,21 @@
-import numpy as np
 import random
 from collections import deque
 
-from model import QNetwork
-
+import numpy as np
 import torch
 import torch.nn as nn
 import torch.optim as optim
 
+from model import QNetwork
 # from old.replay_buffer import PrioritizedReplayBuffer
-# from utils.PrioReplayBuffer import PrioReplayBuffer
+from utils.PrioReplayBuffer import PrioReplayBuffer
 
-BUFFER_SIZE = int(1e6)  # replay buffer size
-BATCH_SIZE = 128  # minibatch size
+BUFFER_SIZE = int(1e5)  # replay buffer size
+BATCH_SIZE = 64  # minibatch size
 GAMMA = 0.99  # discount factor
 TAU = 1e-3  # for soft update of target parameters
-LR = 1e-4  # learning rate
-UPDATE_EVERY = 16  # how often to update the network
+LR = 5e-4  # learning rate
+UPDATE_EVERY = 4  # how often to update the network
 # UPDATE_TARGET_EVERY = 100 * UPDATE_EVERY #20
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
@@ -45,7 +44,7 @@ class Agent():
         self.optimizer = optim.Adam(self.qnetwork_local.parameters(), lr=LR)
 
         # Replay memory
-        self.memory = ReplayBuffer(BUFFER_SIZE)  # PrioReplayBuffer(buf_size=BUFFER_SIZE, prob_alpha=0)
+        self.memory = PrioReplayBuffer(buf_size=BUFFER_SIZE, prob_alpha=0)  # ReplayBuffer(BUFFER_SIZE)
         self.local_memory = []
         # Initialize time step (for updating every UPDATE_EVERY steps)
         self.t_step = 0
@@ -185,7 +184,7 @@ class ReplayBuffer:
     def sample(self, batch_size, beta):
         """Randomly sample a batch of experiences from memory."""
         experiences = random.sample(self.memory, k=batch_size)
-        return experiences, [1.0]*batch_size, [1.0]*batch_size
+        return experiences, [1.0] * batch_size, [1.0] * batch_size
 
     def update_priorities(self, a, b):
         pass
