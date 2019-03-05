@@ -37,7 +37,7 @@ state_size = len(state)
 print('States have length:', state_size)
 
 STARTING_BETA = 0.5
-ALPHA = 0.4
+ALPHA = 0.7
 EPS_DECAY = 0.2
 
 current_time = currentDT.strftime('%b%d_%H-%M-%S')
