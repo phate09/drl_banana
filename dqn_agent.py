@@ -25,7 +25,7 @@ device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 class Agent():
     """Interacts with and learns from the environment."""
 
-    def __init__(self, state_size, action_size, seed):
+    def __init__(self, state_size, action_size, seed, alpha=0.6):
         """Initialize an Agent object.
 
         Params
@@ -44,7 +44,7 @@ class Agent():
         self.optimizer = optim.Adam(self.qnetwork_local.parameters(), lr=LR)
 
         # Replay memory
-        self.memory = PrioReplayBuffer(buf_size=BUFFER_SIZE, prob_alpha=0)  # ReplayBuffer(BUFFER_SIZE)
+        self.memory = PrioReplayBuffer(buf_size=BUFFER_SIZE, prob_alpha=alpha)  # ReplayBuffer(BUFFER_SIZE)
         self.local_memory = []
         # Initialize time step (for updating every UPDATE_EVERY steps)
         self.t_step = 0
