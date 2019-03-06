@@ -13,7 +13,7 @@ from utils.Scheduler import Scheduler
 
 currentDT = datetime.datetime.now()
 print(f'Start at {currentDT.strftime("%Y-%m-%d %H:%M:%S")}')
-seed = 0
+seed = 5
 np.random.seed(seed)
 env = UnityEnvironment(file_name="environment/Banana_Linux_NoVis/Banana.x86_64", seed=seed)
 
@@ -38,7 +38,7 @@ state_size = len(example_state)
 print('States have length:', state_size)
 
 STARTING_BETA = 0.5
-ALPHA = 0.8
+ALPHA = 0.4
 EPS_DECAY = 0.2
 MIN_EPS = 0.01
 
@@ -103,4 +103,4 @@ plt.xlabel('Episode #')
 plt.show()
 finish_T = datetime.datetime.now()
 print()
-print(f"Finish at {finish_T.strftime('%b%d_%H-%M-%S')}")
+print(f"Finish at {finish_T.strftime('%Y-%m-%d %H:%M:%S')}")
