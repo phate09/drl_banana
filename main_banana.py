@@ -13,7 +13,9 @@ from utils.Scheduler import Scheduler
 
 currentDT = datetime.datetime.now()
 print(f'Start at {currentDT.strftime("%Y-%m-%d %H:%M:%S")}')
-env = UnityEnvironment(file_name="environment/Banana_Linux_NoVis/Banana.x86_64")
+seed = 0
+np.random.seed(seed)
+env = UnityEnvironment(file_name="environment/Banana_Linux_NoVis/Banana.x86_64", seed=seed)
 
 # get the default brain
 brain_name = env.brain_names[0]
