@@ -12,7 +12,7 @@ class PrioReplayBuffer:
     def __len__(self):
         return len(self.buffer)
 
-    def populate(self, sample, td_error=None):
+    def push(self, sample, td_error=None):
         max_prio = self.priorities.max() if self.buffer else 1.0
         if len(self.buffer) < self.capacity:
             self.buffer.append(sample)

@@ -13,9 +13,8 @@ from utils.Scheduler import Scheduler
 
 currentDT = datetime.datetime.now()
 print(f'Start at {currentDT.strftime("%Y-%m-%d %H:%M:%S")}')
-# env = gym.make('LunarLander-v2')
-# env.seed(0)
-env = UnityEnvironment(file_name="/home/edoardo/Downloads/Banana_Linux_NoVis/Banana.x86_64")
+env = UnityEnvironment(file_name="environment/Banana_Linux_NoVis/Banana.x86_64")
+
 # get the default brain
 brain_name = env.brain_names[0]
 brain = env.brains[brain_name]
@@ -31,9 +30,9 @@ action_size = brain.vector_action_space_size
 print('Number of actions:', action_size)
 
 # examine the state space
-state = env_info.vector_observations[0]
-print('States look like:', state)
-state_size = len(state)
+example_state = env_info.vector_observations[0]
+print('States look like:', example_state)
+state_size = len(example_state)
 print('States have length:', state_size)
 
 STARTING_BETA = 0.5
@@ -48,16 +47,6 @@ agent = Agent(state_size=state_size, action_size=action_size, seed=0, alpha=ALPH
 
 
 def dqn(n_episodes=2000, max_t=1000, eps_start=1.0, eps_end=0.01):
-    """Deep Q-Learning.
-
-    Params
-    ======
-        n_episodes (int): maximum number of training episodes
-        max_t (int): maximum number of timesteps per episode
-        eps_start (float): starting value of epsilon, for epsilon-greedy action selection
-        eps_end (float): minimum value of epsilon
-        eps_decay (float): multiplicative factor (per episode) for decreasing epsilon
-    """
     scores = []  # list containing scores from each episode
     scores_window = deque(maxlen=100)  # last 100 scores
 
@@ -73,7 +62,6 @@ def dqn(n_episodes=2000, max_t=1000, eps_start=1.0, eps_end=0.01):
             next_state = env_info.vector_observations[0]  # get the next state
             reward = env_info.rewards[0]  # get the reward
             done = env_info.local_done[0]  # see if episode has finished
-            # next_state, reward, done, _ = env.step(action)
             agent.step(state, action, reward, next_state, done, beta=betas.get(i_episode))
             state = next_state
             score += reward
@@ -101,12 +89,12 @@ def dqn(n_episodes=2000, max_t=1000, eps_start=1.0, eps_end=0.01):
     return scores
 
 
-scores = dqn()
+return_scores = dqn()
 
 # plot the scores
 fig = plt.figure()
 ax = fig.add_subplot(111)
-plt.plot(np.arange(len(scores)), scores)
+plt.plot(np.arange(len(return_scores)), return_scores)
 plt.ylabel('Score')
 plt.xlabel('Episode #')
 plt.show()

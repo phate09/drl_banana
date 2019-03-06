@@ -1,5 +1,4 @@
 import random
-from collections import deque
 
 import numpy as np
 import torch
@@ -7,8 +6,7 @@ import torch.nn as nn
 import torch.optim as optim
 
 from model import QNetwork
-# from old.replay_buffer import PrioritizedReplayBuffer
-from utils.PrioReplayBuffer import PrioReplayBuffer
+from utils.ReplayMemory import PrioritizedReplayMemory
 
 BUFFER_SIZE = int(1e5)  # replay buffer size
 BATCH_SIZE = 64  # minibatch size
@@ -16,7 +14,6 @@ GAMMA = 0.99  # discount factor
 TAU = 1e-3  # for soft update of target parameters
 LR = 5e-4  # learning rate
 UPDATE_EVERY = 4  # how often to update the network
-# UPDATE_TARGET_EVERY = 100 * UPDATE_EVERY #20
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
@@ -44,7 +41,7 @@ class Agent():
         self.optimizer = optim.Adam(self.qnetwork_local.parameters(), lr=LR)
 
         # Replay memory
-        self.memory = PrioReplayBuffer(buf_size=BUFFER_SIZE, prob_alpha=alpha)  # ReplayBuffer(BUFFER_SIZE)
+        self.memory = PrioritizedReplayMemory(BUFFER_SIZE, alpha=alpha)  # PrioReplayBuffer(buf_size=BUFFER_SIZE, prob_alpha=alpha)  # ReplayBuffer(BUFFER_SIZE)
         self.local_memory = []
         # Initialize time step (for updating every UPDATE_EVERY steps)
         self.t_step = 0
@@ -56,7 +53,6 @@ class Agent():
         self.local_memory.append((state, action, reward, next_state, done))
         # Learn every UPDATE_EVERY time steps.
         self.t_step = (self.t_step + 1) % UPDATE_EVERY
-        # self.t_update_target_step = (self.t_update_target_step + 1) % UPDATE_TARGET_EVERY
 
         if self.t_step == 0:
 
@@ -79,7 +75,7 @@ class Agent():
                 td_errors = torch.abs(target_Q - Qa_s)
                 # store the local memory in the PER
                 for memory, error in zip(self.local_memory, td_errors):
-                    self.memory.populate(memory, error)  # td_errors
+                    self.memory.push(memory, error)  # td_errors
             # empty the memory
             self.local_memory = []
             # If enough samples are available in memory, get random subset and learn
@@ -161,39 +157,3 @@ class Agent():
         """
         for target_param, local_param in zip(target_model.parameters(), local_model.parameters()):
             target_param.data.copy_(tau * local_param.data + (1.0 - tau) * target_param.data)
-
-
-class ReplayBuffer:
-    """Fixed-size buffer to store experience tuples."""
-
-    def __init__(self, buffer_size, seed=0):
-        """Initialize a ReplayBuffer object.
-
-        Params
-        ======
-            action_size (int): dimension of each action
-            buffer_size (int): maximum size of buffer
-            batch_size (int): size of each training batch
-            seed (int): random seed
-        """
-        self.memory = deque(maxlen=buffer_size)
-
-        # self.experience = namedtuple("Experience", field_names=["state", "action", "reward", "next_state", "done"])
-        self.seed = random.seed(seed)
-
-    def populate(self, memory, td_error=0):
-        """Add a new experience to memory."""
-        # e = self.experience(state, action, reward, next_state, done)
-        self.memory.append(memory)
-
-    def sample(self, batch_size, beta):
-        """Randomly sample a batch of experiences from memory."""
-        experiences = random.sample(self.memory, k=batch_size)
-        return experiences, [1.0] * batch_size, [1.0] * batch_size
-
-    def update_priorities(self, a, b):
-        pass
-
-    def __len__(self):
-        """Return the current size of internal memory."""
-        return len(self.memory)

@@ -3,7 +3,7 @@ from unityagents import UnityEnvironment
 
 from dqn_agent import Agent
 
-env = UnityEnvironment(file_name="/home/edoardo/Downloads/Banana_Linux/Banana.x86_64")
+env = UnityEnvironment(file_name="environment/Banana_Linux/Banana.x86_64")
 # get the default brain
 brain_name = env.brain_names[0]
 brain = env.brains[brain_name]
@@ -16,7 +16,7 @@ state = env_info.vector_observations[0]
 state_size = len(state)
 score = 0  # initialize the score
 agent = Agent(state_size=state_size, action_size=action_size, seed=0, alpha=0.6)
-agent.qnetwork_local.load_state_dict(torch.load('checkpoint.pth'))
+agent.qnetwork_local.load_state_dict(torch.load('model.pth'))
 for i in range(1):
     score = 0
     env_info = env.reset(train_mode=False)[brain_name]  # reset the environment
