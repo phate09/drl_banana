@@ -1,9 +1,8 @@
 import random
-import numpy as np
-import torch
 
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-from utils.data_structures import SegmentTree, MinSegmentTree, SumSegmentTree
+import numpy as np
+
+from utils.data_structures import MinSegmentTree, SumSegmentTree
 
 
 class ExperienceReplayMemory:
@@ -123,7 +122,7 @@ class PrioritizedReplayMemory(object):
             p_sample = self._it_sum[idx] / self._it_sum.sum()
             weight = (p_sample * len(self._storage)) ** (-beta)
             weights.append(weight / max_weight)
-        weights = torch.tensor(weights, device=device, dtype=torch.float)
+        weights = np.array(weights, dtype=np.float32)  # torch.tensor(weights, device=device, dtype=torch.float)
         encoded_sample = self._encode_sample(idxes)
         return encoded_sample, idxes, weights
 

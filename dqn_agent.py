@@ -6,7 +6,7 @@ import torch.nn as nn
 import torch.optim as optim
 
 from model import QNetwork
-from utils.ReplayMemory import PrioritizedReplayMemory
+from utils.PrioReplayBuffer import PrioReplayBuffer
 
 BUFFER_SIZE = int(1e5)  # replay buffer size
 BATCH_SIZE = 64  # minibatch size
@@ -41,7 +41,7 @@ class Agent():
         self.optimizer = optim.Adam(self.qnetwork_local.parameters(), lr=LR)
 
         # Replay memory
-        self.memory = PrioritizedReplayMemory(BUFFER_SIZE, alpha=alpha)  # PrioReplayBuffer(buf_size=BUFFER_SIZE, prob_alpha=alpha)  # ReplayBuffer(BUFFER_SIZE)
+        self.memory = PrioReplayBuffer(BUFFER_SIZE, alpha=alpha)  # PrioReplayBuffer(buf_size=BUFFER_SIZE, prob_alpha=alpha)  # ReplayBuffer(BUFFER_SIZE)
         self.local_memory = []
         # Initialize time step (for updating every UPDATE_EVERY steps)
         self.t_step = 0

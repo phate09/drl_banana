@@ -2,12 +2,12 @@ import numpy as np
 
 
 class PrioReplayBuffer:
-    def __init__(self, buf_size, prob_alpha=0.6):
-        self.prob_alpha = prob_alpha
-        self.capacity = buf_size
+    def __init__(self, capacity, alpha=0.6):
+        self.prob_alpha = alpha
+        self.capacity = capacity
         self.pos = 0
         self.buffer = []
-        self.priorities = np.zeros((buf_size,), dtype=np.float32)
+        self.priorities = np.zeros((capacity,), dtype=np.float32)
 
     def __len__(self):
         return len(self.buffer)
