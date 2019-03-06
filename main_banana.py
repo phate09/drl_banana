@@ -38,17 +38,18 @@ state_size = len(example_state)
 print('States have length:', state_size)
 
 STARTING_BETA = 0.5
-ALPHA = 0.7
+ALPHA = 0.6
 EPS_DECAY = 0.2
+MIN_EPS = 0.05
 
 current_time = currentDT.strftime('%b%d_%H-%M-%S')
-comment = f"alpha={ALPHA}, beta={STARTING_BETA}->1.0, eps_decay={EPS_DECAY}"
+comment = f"alpha={ALPHA}, min_eps={MIN_EPS}, eps_decay={EPS_DECAY}"
 log_dir = os.path.join('runs', current_time + '_' + comment)
 writer = SummaryWriter(log_dir=log_dir)
 agent = Agent(state_size=state_size, action_size=action_size, seed=0, alpha=ALPHA)
 
 
-def dqn(n_episodes=2000, max_t=1000, eps_start=1.0, eps_end=0.01):
+def dqn(n_episodes=2000, max_t=1000, eps_start=1.0, eps_end=MIN_EPS):
     scores = []  # list containing scores from each episode
     scores_window = deque(maxlen=100)  # last 100 scores
 
@@ -101,4 +102,5 @@ plt.ylabel('Score')
 plt.xlabel('Episode #')
 plt.show()
 finish_T = datetime.datetime.now()
+print()
 print(f"Finish at {finish_T.strftime('%b%d_%H-%M-%S')}")
