@@ -38,9 +38,9 @@ state_size = len(example_state)
 print('States have length:', state_size)
 
 STARTING_BETA = 0.5
-ALPHA = 0.6
+ALPHA = 0.8
 EPS_DECAY = 0.2
-MIN_EPS = 0.05
+MIN_EPS = 0.01
 
 current_time = currentDT.strftime('%b%d_%H-%M-%S')
 comment = f"alpha={ALPHA}, min_eps={MIN_EPS}, eps_decay={EPS_DECAY}"

@@ -51,6 +51,8 @@ The code will generate Tensorboard stats for visualisation. You can see them by 
 ```tensorboard --logdir run``` from the ```drl_banana``` folder
 
 ### Testing
+The latest model from the agent will be saved in ```checkpoint.pth```.
+Rename ```checkpoint.pth``` into ```model.pth``` 
 
 To look at the agent in action run the following:
 
